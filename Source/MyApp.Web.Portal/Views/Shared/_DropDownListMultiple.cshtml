@@ -1,0 +1,14 @@
+﻿@model MyApp.Web.Portal.Models.DropDownListMultipleModel
+<select id="@Model.Id" name="@Model.Id" @{if (!String.IsNullOrWhiteSpace(Model.CssClass)) { <text> class="@Model.CssClass" </text> } } @{if (Model.HtmlAttributes != null) { foreach (var attr in Model.HtmlAttributes) { <text> @attr.Key="@attr.Value" </text>  } } } multiple>
+    @if (Model.OpcionVaciaTexto != null)
+    {
+        <option>@Model.OpcionVaciaTexto</option>
+    }
+    @if (Model.Items != null)
+    {
+        foreach (var item in Model.Items)
+        {
+            <option value="@item.Value" @{if (item.Selected) { <text> selected</text>} }>@item.Text</option>
+        }
+    }
+</select>

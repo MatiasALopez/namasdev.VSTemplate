@@ -1,0 +1,5 @@
+﻿@model MyApp.Web.Portal.Models.LinkArchivoItemModel
+@if (Model != null)
+{
+    <a href="@Model.LinkDescargaURL" @{ if (Model.SePuedeVisualizar){<text>data-iframe data-iframe-title="@Model.Nombre" data-iframe-modal-size="lg" data-iframe-height="500px"</text>} } class="@Model.ClassCss">@Model.Nombre <i class="fa @(Model.SePuedeVisualizar ? "fa-eye" : "fa-download")"></i></a>
+}

@@ -1,0 +1,7 @@
+﻿@{ var mensaje = ViewBag.Alerta as string;  }
+@if (!String.IsNullOrWhiteSpace(mensaje))
+{
+    <div class="alert alert-warning">
+        @Html.Raw(mensaje)
+    </div>
+}

@@ -1,0 +1,2 @@
+﻿@model MyApp.Web.Portal.Models.LinkOrdenPOST
+<a href="#" class="link-orden" data-orden="@URLHelper.GenerarExpresionOrden(Model.Orden, Request.Form["orden"], aplicarDescSoloAlPrimerElementoDeExpresion: Model.AplicarDescSoloAlPrimerElementoDeExpresion)">@Model.Texto</a>

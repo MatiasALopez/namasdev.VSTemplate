@@ -1,0 +1,8 @@
+﻿@model MyApp.Web.Portal.Models.DropDownListDependienteModel
+<select id="@Model.Id" name="@Model.Id" @{if (!String.IsNullOrWhiteSpace(Model.CssClass)) {<text>class="@Model.CssClass"</text>} } @{if (Model.HtmlAttributes != null) { foreach (var attr in Model.HtmlAttributes) { <text>@attr.Key="@attr.Value"</text> } } }>
+</select>
+<script type="text/javascript">
+    $(function () {
+        inicializarCombosEnCascadaAJAX('@Model.Id', @{ if (Model.OpcionVaciaTexto == null) {<text>null</text> } else {<text>'@Model.OpcionVaciaTexto'</text> } }, '@Model.IdComboPadre', '@Model.UrlBusquedaItems', @Model.ItemsAddedCallback);
+    });
+</script>

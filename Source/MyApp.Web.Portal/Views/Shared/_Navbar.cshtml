@@ -1,0 +1,27 @@
+﻿@using MyApp.Web.Portal.Helpers;
+@{
+    var usuarioHelper = new UsuarioHelper(this.Context);
+    string nombreCompleto = usuarioHelper.Usuario?.NombresYApellidos;
+}
+@if (Request.IsAuthenticated)
+{
+    <ul class="navbar-nav ml-auto d-none d-md-flex">
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fa fa-user"></i>
+                @nombreCompleto
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Salir</a>
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="navbar-nav ml-auto d-sm-none">
+        <li class="nav-item">
+            <a class="nav-link" href="~/account/login">Iniciar sesión</a>
+        </li>
+    </ul>
+}

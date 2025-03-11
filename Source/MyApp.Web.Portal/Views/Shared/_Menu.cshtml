@@ -1,0 +1,47 @@
+﻿@using MyApp.Web.Portal.Helpers;
+@using MyApp.Entidades;
+@{
+    var usuarioHelper = new UsuarioHelper(this.Context);
+}
+@if (Request.IsAuthenticated)
+{
+    <nav id="sidebarMenu" class="bg-lightgray collapse hide d-print-none">
+        <ul class="list-unstyled components">
+            <li id="menuFunciones">
+                <a href="#submenuFunciones" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Funciones</a>
+                <ul class="collapse list-unstyled sidebar-submenu" id="submenuFunciones">
+                    @if (usuarioHelper.PerteneceAlRol(AspNetRoles.ADMINISTRADOR))
+                    {
+                        <li class="menu-usuarios"><a href="@Url.Action("Index", "Usuarios")">Usuarios</a></li>
+                    }
+                </ul>
+            </li>
+            <li id="menuReportes">
+                <a href="#submenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
+                <ul class="collapse list-unstyled sidebar-submenu" id="submenuReportes">
+                    @if (usuarioHelper.PerteneceAlRol(AspNetRoles.ADMINISTRADOR))
+                    {
+                    }
+                </ul>
+            </li>
+            @if (Request.IsAuthenticated)
+            {
+                <li class="d-md-none">
+                    <a class="nav-link" href="#">
+                        <i class="fa fa-user"></i>
+                        @User.Identity.Name
+                    </a>
+                </li>
+                <li class="d-md-none">
+                    <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Salir</a>
+                </li>
+            }
+            else
+            {
+                <li class="d-md-none">
+                    <a class="nav-link" href="~/account/login">Iniciar sesión</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

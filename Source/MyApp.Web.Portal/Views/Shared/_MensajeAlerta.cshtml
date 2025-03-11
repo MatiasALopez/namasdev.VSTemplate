@@ -1,0 +1,7 @@
+﻿@model string
+@if (!String.IsNullOrWhiteSpace(Model))
+{
+    <div class="alert alert-warning">
+        @Html.Raw(Model)
+    </div>
+}

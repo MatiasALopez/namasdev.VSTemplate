@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Cuenta activada";
+}
+<section id="loginForm">
+    <div class="mt-3">
+        @Html.Partial("_MensajeOk", "Tu cuenta ha sido activada correctamente")
+    </div>
+    <p class="mt-3">
+        <a href="@Url.Action("Login", "Account")">Volver</a>
+    </p>
+</section>

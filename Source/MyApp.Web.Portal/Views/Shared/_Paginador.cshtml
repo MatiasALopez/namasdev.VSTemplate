@@ -1,0 +1,50 @@
+﻿@using namasdev.Web.Helpers; 
+@model namasdev.Web.Models.Paginacion
+@{ 
+    const int cantMaxPaginasAMostrar = 7;
+    int cantMediaPaginasAMostrar = (int)Math.Floor((double)cantMaxPaginasAMostrar / 2);
+}
+@if (!Model.TieneUnicaPagina)
+{
+    <nav aria-label="Paginacion">
+        <ul class="pagination">
+            <li class="page-item @(Model.TienePaginaAnterior ? "" : "disabled")">
+                <a class="page-link" @{if (Model.TienePaginaAnterior) { <text> href="@URLHelper.GenerarUrlConPagina(Request.Url, Model.PaginaAnterior)" </text> } } aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @{
+                int paginaDesde;
+                int paginaHasta;
+                if (Model.CantTotalPaginas <= cantMaxPaginasAMostrar)
+                {
+                    paginaDesde = 1;
+                    paginaHasta = Model.CantTotalPaginas;
+                }
+                else
+                {
+                    paginaDesde = Math.Max(Model.PaginaActual - cantMediaPaginasAMostrar, 1);
+                    paginaHasta = Math.Min(paginaDesde + cantMaxPaginasAMostrar - 1, Model.CantTotalPaginas);
+                    paginaDesde = paginaHasta - (cantMaxPaginasAMostrar - 1); // NOTA: para ajustar paginas finales
+                }
+                if (paginaDesde - 1 >= 1)
+                {
+                    <li class="page-item"><a class="page-link" href="@URLHelper.GenerarUrlConPagina(Request.Url, paginaDesde - 1)">...</a></li>
+                }
+                for (var i = paginaDesde; i <= paginaHasta; i++)
+                {
+                    <li class="page-item @(Model.PaginaActual == i ? "active" : "")"><a class="page-link" href="@URLHelper.GenerarUrlConPagina(Request.Url, i)">@i</a></li>
+                }
+                if (paginaHasta + 1 <= Model.CantTotalPaginas)
+                {
+                    <li class="page-item"><a class="page-link" href="@URLHelper.GenerarUrlConPagina(Request.Url, paginaHasta + 1)">...</a></li>
+                }
+            }
+            <li class="page-item @(Model.TienePaginaSiguiente ? "" : "disabled")">
+                <a class="page-link" @{if (Model.TienePaginaSiguiente) { <text> href="@URLHelper.GenerarUrlConPagina(Request.Url, Model.PaginaSiguiente)" </text> } } aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

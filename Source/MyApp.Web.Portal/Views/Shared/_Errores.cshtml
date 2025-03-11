@@ -1,0 +1,10 @@
+﻿@{ var errores = ViewBag.Errores as IEnumerable<string>;  }
+@if (errores != null)
+{
+    <div class="alert alert-danger my-2">
+        @foreach (string error in errores)
+        {
+            @Html.Raw(error)<br />
+        }
+    </div>
+}
