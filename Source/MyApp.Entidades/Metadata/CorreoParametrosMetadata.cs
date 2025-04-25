@@ -15,20 +15,23 @@ namespace MyApp.Entidades.Metadata
             public const string ID = "Id";
         }
 
-        public class Asunto
+        public class Propiedades
         {
-            public const string ETIQUETA = "Asunto";
-            public const int TAMAÑO_MAX = 256;
-        }
+            public class Asunto
+            {
+                public const string ETIQUETA = "Asunto";
+                public const int TAMAÑO_MAX = 256;
+            }
 
-        public class Contenido
-        {
-            public const string ETIQUETA = "Contenido";
-        }
+            public class Contenido
+            {
+                public const string ETIQUETA = "Contenido";
+            }
 
-        public class CopiaOculta
-        {
-            public const string ETIQUETA = "Copia oculta";
+            public class CopiaOculta
+            {
+                public const string ETIQUETA = "Copia oculta";
+            }
         }
     }
 }

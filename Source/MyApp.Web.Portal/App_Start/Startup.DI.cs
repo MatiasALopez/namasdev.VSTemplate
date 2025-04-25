@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-
 using Newtonsoft.Json;
-
 using namasdev.Net.Correos;
-using MyApp.Entidades;
+
+using MyApp.Entidades.Valores;
 using MyApp.Datos;
 using MyApp.Datos.Sql;
 using MyApp.Negocio;
@@ -28,9 +28,15 @@ namespace MyApp.Web.Portal
 
         private void RegisterServices(ServiceCollection services)
         {
+            RegisterUtils(services);
             RegisterRepositorios(services);
             RegisterNegocios(services);
             RegisterControllers(services);
+        }
+
+        private void RegisterUtils(ServiceCollection services)
+        {
+            services.AddAutoMapper(typeof(Startup).Assembly, typeof(UsuariosNegocio).Assembly);
         }
 
         private void RegisterRepositorios(ServiceCollection services)
@@ -38,6 +44,7 @@ namespace MyApp.Web.Portal
             services.AddScoped<SqlContext>();
 
             services.AddScoped<IParametrosRepositorio, ParametrosRepositorio>();
+            services.AddScoped<IErroresRepositorio, ErroresRepositorio>();
             services.AddScoped<ICorreosParametrosRepositorio, CorreosParametrosRepositorio>();
             services.AddScoped<IUsuariosRepositorio, UsuariosRepositorio>();
         }
@@ -46,6 +53,7 @@ namespace MyApp.Web.Portal
         {
             services.AddSingleton<ServidorDeCorreosParametros>((sp) => JsonConvert.DeserializeObject<ServidorDeCorreosParametros>(sp.GetService<IParametrosRepositorio>().Obtener(Parametros.SERVIDOR_CORREOS)));
             
+            services.AddScoped<IErroresNegocio, ErroresNegocio>();
             services.AddScoped<IServidorDeCorreos, ServidorDeCorreos>();
             services.AddScoped<ICorreosNegocio, CorreosNegocio>();
             services.AddScoped<IUsuariosNegocio, UsuariosNegocio>();
@@ -54,6 +62,7 @@ namespace MyApp.Web.Portal
         private void RegisterControllers(ServiceCollection services)
         {
             services.AddTransient<AccountController>();
+            services.AddTransient<HomeController>();
             services.AddTransient<UsuariosController>();
         }
     }

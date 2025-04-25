@@ -13,7 +13,7 @@ namespace MyApp.Datos.Sql.Config
 
             Property(e => e.Nombre)
                 .IsRequired()
-                .HasMaxLength(Entidades.Metadata.ParametroMetadata.Nombre.TAMAÑO_MAX);
+                .HasMaxLength(Entidades.Metadata.ParametroMetadata.Propiedades.Nombre.TAMAÑO_MAX);
         }
     }
 }

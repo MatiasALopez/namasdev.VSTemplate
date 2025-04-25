@@ -5,12 +5,20 @@ using System.Transactions;
 using namasdev.Core.Exceptions;
 using namasdev.Core.Transactions;
 using namasdev.Core.Validation;
+
 using MyApp.Entidades;
+using MyApp.Entidades.Valores;
 using MyApp.Datos;
 
 namespace MyApp.Negocio
 {
-    public class ErroresNegocio
+    public interface IErroresNegocio
+    {
+        string AgregarYObtenerMensajeAlUsuario(Exception ex, params object[] argumentos);
+        string AgregarYObtenerMensajeAlUsuario(Exception ex, string userId, params object[] argumentos);
+    }
+
+    public class ErroresNegocio : IErroresNegocio
     {
         private IErroresRepositorio _erroresRepositorio;
         private IParametrosRepositorio _parametrosRepositorio;

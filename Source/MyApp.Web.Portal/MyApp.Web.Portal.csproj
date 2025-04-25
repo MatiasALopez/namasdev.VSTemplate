@@ -46,6 +46,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper.Extensions.Microsoft.DependencyInjection, Version=0.0.0.0, Culture=neutral, PublicKeyToken=e767ac9c89543656, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.Extensions.Microsoft.DependencyInjection.7.0.0\lib\netstandard2.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -223,6 +229,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\Startup.DI.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Automapper\UsuariosProfile.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ControllerBase.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -232,7 +239,11 @@
     </Compile>
     <Compile Include="Helpers\ListasHelper.cs" />
     <Compile Include="Helpers\UsuarioHelper.cs" />
-    <Compile Include="Mappers\UsuariosMapper.cs" />
+    <Compile Include="Metadata\Textos.cs" />
+    <Compile Include="Metadata\Views\AccountViews.cs" />
+    <Compile Include="Metadata\Views\HomeViews.cs" />
+    <Compile Include="Metadata\Views\SharedViews.cs" />
+    <Compile Include="Metadata\Views\UsuariosViews.cs" />
     <Compile Include="Models\BootstrapSelectResultData.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Usuarios\UsuarioItemModel.cs" />
@@ -241,9 +252,6 @@
     <Compile Include="ViewModels\AccountViewModels.cs" />
     <Compile Include="ViewModels\Usuarios\UsuariosViewModel.cs" />
     <Compile Include="ViewModels\Usuarios\UsuarioViewModel.cs" />
-    <Compile Include="Views\Account.cs" />
-    <Compile Include="Views\Shared.cs" />
-    <Compile Include="Views\Usuarios.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\ajax-bootstrap-select.min.css" />
@@ -318,7 +326,6 @@
     <Content Include="Views\Shared\_LinkArchivoItem.cshtml" />
     <Content Include="Views\Shared\_LinkOrdenPOST.cshtml" />
     <Content Include="Views\Shared\AccesoDenegado.cshtml" />
-    <Content Include="Views\Shared\Entidad.cshtml" />
     <Content Include="Views\Shared\_MensajeAlerta.cshtml" />
     <Content Include="Views\Shared\_MensajeError.cshtml" />
     <Content Include="Views\Shared\_MensajeInfo.cshtml" />

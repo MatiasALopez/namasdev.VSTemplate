@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Linq;
 
 using namasdev.Data.Entity;
+
 using MyApp.Entidades;
 
 namespace MyApp.Datos.Sql

@@ -66,16 +66,16 @@
                                 <td>@item.Email</td>
                                 <td>@item.Rol</td>
                                 <td class="text-center">
-                                    <a href="@Url.Action("Editar", new { id = item.UsuarioId })" class="btn btn-sm btn-outline-secondary"><i class="fa fa-edit" data-toggle="tooltip" title="Editar"></i></a>
+                                    <a href="@Url.Action("Editar", new { id = item.Id })" class="btn btn-sm btn-outline-secondary"><i class="fa fa-edit" data-toggle="tooltip" title="Editar"></i></a>
                                     @if (item.Activado)
                                     {
-                                        <button class="btn btn-sm btn-outline-secondary @clasesCss.BotonResetearPassword" data-id="@item.UsuarioId"><i class="fa fa-key" data-toggle="tooltip" title="Resetear password"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary @clasesCss.BotonResetearPassword" data-id="@item.Id"><i class="fa fa-key" data-toggle="tooltip" title="Resetear password"></i></button>
                                     }
                                     else
                                     {
-                                        <button class="btn btn-sm btn-outline-secondary @clasesCss.BotonReenviarActivacion" data-id="@item.UsuarioId"><i class="fa fa-envelope" data-toggle="tooltip" title="Reenviar activación"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary @clasesCss.BotonReenviarActivacion" data-id="@item.Id"><i class="fa fa-envelope" data-toggle="tooltip" title="Reenviar activación"></i></button>
                                     }
-                                    <button class="btn btn-sm btn-outline-danger @clasesCss.BotonEliminar" data-id="@item.UsuarioId"><i data-toggle="tooltip" title="Eliminar" class="fa fa-trash"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger @clasesCss.BotonEliminar" data-id="@item.Id"><i data-toggle="tooltip" title="Eliminar" class="fa fa-trash"></i></button>
                                 </td>
                             </tr>
                         }

@@ -3,14 +3,17 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
+using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-
 using namasdev.Core.Validation;
 using namasdev.Web.Helpers;
+
 using MyApp.Datos;
 using MyApp.Negocio;
 using MyApp.Web.Portal.ViewModels;
+using MyApp.Web.Portal.Metadata;
+using MyApp.Web.Portal.Metadata.Views;
 
 namespace MyApp.Web.Portal.Controllers
 {
@@ -25,7 +28,8 @@ namespace MyApp.Web.Portal.Controllers
         private readonly IUsuariosNegocio _usuariosNegocio;
         private readonly ICorreosNegocio _correosNegocio;
 
-        public AccountController(IUsuariosRepositorio usuariosRepositorio, IUsuariosNegocio usuariosNegocio, ICorreosNegocio correosNegocio)
+        public AccountController(IUsuariosRepositorio usuariosRepositorio, IUsuariosNegocio usuariosNegocio, ICorreosNegocio correosNegocio, IMapper mapper)
+            : base(mapper)
         {
             Validador.ValidarArgumentRequeridoYThrow(usuariosRepositorio, nameof(usuariosRepositorio));
             Validador.ValidarArgumentRequeridoYThrow(usuariosNegocio, nameof(usuariosNegocio));
@@ -36,7 +40,8 @@ namespace MyApp.Web.Portal.Controllers
             _correosNegocio = correosNegocio;
         }
 
-        public AccountController(ApplicationSignInManager signInManager)
+        public AccountController(ApplicationSignInManager signInManager, IMapper mapper)
+            : base(mapper)
         {
             SignInManager = signInManager;
         }
@@ -79,12 +84,12 @@ namespace MyApp.Web.Portal.Controllers
                     return RedirectToLocal(returnUrl, model.Email);
 
                 case SignInStatus.LockedOut:
-                    return View(Views.Shared.ACCESO_DENEGADO);
+                    return View(SharedViews.ACCESO_DENEGADO);
 
                 case SignInStatus.RequiresVerification:
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("", "Los datos ingresados no son válidos.");
+                    ModelState.AddModelError("", Textos.DATOS_INVALIDOS);
                     return View(model);
             }
         }
@@ -95,7 +100,7 @@ namespace MyApp.Web.Portal.Controllers
         {
             SignOutAndClearSession();
 
-            return RedirectToAction(nameof(HomeController.Index), HomeController.NAME);
+            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
         }
 
         [AllowAnonymous]
@@ -103,13 +108,13 @@ namespace MyApp.Web.Portal.Controllers
         {
             if (String.IsNullOrWhiteSpace(id) || String.IsNullOrWhiteSpace(code))
             {
-                return View(Views.Shared.ERROR);
+                return View(SharedViews.ERROR);
             }
 
             var usuarioEntidad = _usuariosRepositorio.Obtener(id);
             if (usuarioEntidad == null)
             {
-                return View(Views.Shared.ERROR);
+                return View(SharedViews.ERROR);
             }
 
             var model = new ActivarCuentaViewModel
@@ -131,7 +136,7 @@ namespace MyApp.Web.Portal.Controllers
                 var usuarioIdentity = UserManager.FindById(id);
                 if (usuarioEntidad == null || usuarioIdentity == null)
                 {
-                    return View(Views.Shared.ERROR);
+                    return View(SharedViews.ERROR);
                 }
 
                 var result = await UserManager.ConfirmEmailAsync(id, model.Code);
@@ -169,7 +174,7 @@ namespace MyApp.Web.Portal.Controllers
                             throw;
                         }
 
-                        return View(Views.Account.ACTIVAR_CUENTA_CONFIRMACION);
+                        return View(AccountViews.ACTIVAR_CUENTA_CONFIRMACION);
                     }
                     else
                     {
@@ -241,13 +246,13 @@ namespace MyApp.Web.Portal.Controllers
         {
             if (String.IsNullOrWhiteSpace(id) || String.IsNullOrWhiteSpace(code))
             {
-                return View(Views.Shared.ERROR);
+                return View(SharedViews.ERROR);
             }
 
             var usuario = UserManager.FindById(id);
             if (usuario == null)
             {
-                return View(Views.Shared.ERROR);
+                return View(SharedViews.ERROR);
             }
 
             var model = new ResetPasswordViewModel
@@ -274,7 +279,7 @@ namespace MyApp.Web.Portal.Controllers
             var result = await UserManager.ResetPasswordAsync(usuarioEntidad.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return View(Views.Account.RESETEAR_PASSWORD_CONFIRMACION);
+                return View(AccountViews.RESETEAR_PASSWORD_CONFIRMACION);
             }
 
             AddErrors(result);
@@ -329,7 +334,7 @@ namespace MyApp.Web.Portal.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction(nameof(HomeController.Index), HomeController.NAME);
+            return RedirectToAction("Index", "Home");
         }
 
         #endregion

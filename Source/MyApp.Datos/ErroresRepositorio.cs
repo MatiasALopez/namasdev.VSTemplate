@@ -2,6 +2,7 @@
 
 using namasdev.Data;
 using namasdev.Data.Entity;
+
 using MyApp.Entidades;
 using MyApp.Datos.Sql;
 

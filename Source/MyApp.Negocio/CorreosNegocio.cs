@@ -7,7 +7,9 @@ using namasdev.Core.IO;
 using namasdev.Core.Exceptions;
 using namasdev.Core.Validation;
 using namasdev.Net.Correos;
+
 using MyApp.Entidades;
+using MyApp.Entidades.Valores;
 using MyApp.Datos;
 
 namespace MyApp.Negocio

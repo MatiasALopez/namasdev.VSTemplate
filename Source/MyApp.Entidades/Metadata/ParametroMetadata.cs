@@ -15,15 +15,18 @@ namespace MyApp.Entidades.Metadata
             public const string ID = "Nombre";
         }
 
-        public class Nombre
+        public class Propiedades
         {
-            public const string ETIQUETA = "Nombre";
-            public const int TAMAÑO_MAX = 100;
-        }
+            public class Nombre
+            {
+                public const string ETIQUETA = "Nombre";
+                public const int TAMAÑO_MAX = 100;
+            }
 
-        public class Valor
-        {
-            public const string ETIQUETA = "Valor";
+            public class Valor
+            {
+                public const string ETIQUETA = "Valor";
+            }
         }
     }
 }

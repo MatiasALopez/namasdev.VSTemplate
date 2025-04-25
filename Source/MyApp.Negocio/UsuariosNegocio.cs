@@ -1,83 +1,104 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using AutoMapper;
 using namasdev.Core.Entity;
 using namasdev.Core.Validation;
+
 using MyApp.Entidades;
 using MyApp.Entidades.Metadata;
 using MyApp.Datos;
+using MyApp.Negocio.DTO.Usuarios;
 
 namespace MyApp.Negocio
 {
     public interface IUsuariosNegocio
     {
-        void Actualizar(Usuario usuario, string usuarioLogueadoId);
-        Usuario Agregar(string usuarioId, string nombres, string apellidos, string email, string usuarioLogueadoId);
-        void DesmarcarComoBorrado(string usuarioId);
-        void MarcarComoBorrado(string usuarioId, string usuarioLogueadoId);
-        void ValidarDatos(Usuario usuario);
+        Usuario Agregar(AgregarParametros parametros);
+        void Actualizar(ActualizarParametros parametros);
+        void MarcarComoBorrado(MarcarComoBorradoParametros parametros);
+        void DesmarcarComoBorrado(DesmarcarComoBorradoParametros parametros);
     }
 
-    public class UsuariosNegocio : IUsuariosNegocio
+    public class UsuariosNegocio : NegocioBase<IUsuariosRepositorio>, IUsuariosNegocio
     {
-        private IUsuariosRepositorio _usuariosRepositorio;
-
-        public UsuariosNegocio(IUsuariosRepositorio usuariosRepositorio)
+        public UsuariosNegocio(IUsuariosRepositorio usuariosRepositorio, IErroresNegocio erroresNegocio, IMapper mapper)
+            : base(usuariosRepositorio, erroresNegocio, mapper)
         {
-            Validador.ValidarArgumentRequeridoYThrow(usuariosRepositorio, nameof(usuariosRepositorio));
-
-            _usuariosRepositorio = usuariosRepositorio;
         }
 
-        public Usuario Agregar(string usuarioId, string nombres, string apellidos, string email, string usuarioLogueadoId)
+        public Usuario Agregar(AgregarParametros parametros)
         {
+            Validador.ValidarArgumentRequeridoYThrow(parametros, nameof(parametros));
+
             DateTime fechaHora = DateTime.Now;
 
-            var usuario = new Usuario
-            {
-                Id = usuarioId,
-                Nombres = nombres,
-                Apellidos = apellidos,
-                Email = email,
-            };
-            usuario.EstablecerDatosCreado(usuarioLogueadoId, fechaHora);
-            usuario.EstablecerDatosModificacion(usuarioLogueadoId, fechaHora);
+            var usuario = Mapper.Map<Usuario>(parametros);
+            usuario.EstablecerDatosCreado(parametros.UsuarioLogueadoId, fechaHora);
+            usuario.EstablecerDatosModificacion(parametros.UsuarioLogueadoId, fechaHora);
 
             ValidarDatos(usuario);
 
-            _usuariosRepositorio.Agregar(usuario);
+            Repositorio.Agregar(usuario);
 
             return usuario;
         }
 
-        public void Actualizar(Usuario usuario, string usuarioLogueadoId)
+        public void Actualizar(ActualizarParametros parametros)
         {
-            usuario.EstablecerDatosModificacion(usuarioLogueadoId, DateTime.Now);
+            Validador.ValidarArgumentRequeridoYThrow(parametros, nameof(parametros));
+
+            DateTime fechaHora = DateTime.Now;
+
+            var usuario = Obtener(parametros.Id);
+            Mapper.Map(parametros, usuario);
+            usuario.EstablecerDatosModificacion(parametros.UsuarioLogueadoId, DateTime.Now);
 
             ValidarDatos(usuario);
 
-            _usuariosRepositorio.Actualizar(usuario);
+            Repositorio.Actualizar(usuario);
         }
 
-        public void MarcarComoBorrado(string usuarioId, string usuarioLogueadoId)
+        public void MarcarComoBorrado(MarcarComoBorradoParametros parametros)
         {
-            var usuario = new Usuario { Id = usuarioId };
-            usuario.EstablecerDatosBorrado(usuarioLogueadoId, DateTime.Now);
-            _usuariosRepositorio.ActualizarDatosBorrado(usuario);
+            Validador.ValidarArgumentRequeridoYThrow(parametros, nameof(parametros));
+
+            DateTime fechaHora = DateTime.Now;
+
+            var usuario = Mapper.Map<Usuario>(parametros);
+            usuario.EstablecerDatosBorrado(parametros.UsuarioLogueadoId, fechaHora);
+
+            Repositorio.ActualizarDatosBorrado(usuario);
         }
 
-        public void DesmarcarComoBorrado(string usuarioId)
+        public void DesmarcarComoBorrado(DesmarcarComoBorradoParametros parametros)
         {
-            _usuariosRepositorio.ActualizarDatosBorrado(new Usuario { Id = usuarioId });
+            Validador.ValidarArgumentRequeridoYThrow(parametros, nameof(parametros));
+
+            var usuario = Mapper.Map<Usuario>(parametros);
+            Repositorio.ActualizarDatosBorrado(usuario);
         }
 
-        public void ValidarDatos(Usuario usuario)
+        private Usuario Obtener(string id,
+            bool validarExistencia = true)
+        {
+            var usuario = Repositorio.Obtener(id);
+            if (validarExistencia
+                && usuario == null)
+            {
+                throw new Exception(Validador.MensajeEntidadInexistente(UsuarioMetadata.ETIQUETA, id));
+            }
+
+            return usuario;
+        }
+
+        private void ValidarDatos(Usuario usuario)
         {
             var errores = new List<string>();
 
-            Validador.ValidarEmailYAgregarAListaErrores(usuario.Email, UsuarioMetadata.Email.ETIQUETA, requerido: true, errores);
-            Validador.ValidarStringYAgregarAListaErrores(usuario.Nombres, UsuarioMetadata.Nombres.ETIQUETA, requerido: true, errores, tamañoMaximo: UsuarioMetadata.Nombres.TAMAÑO_MAX);
-            Validador.ValidarStringYAgregarAListaErrores(usuario.Apellidos, UsuarioMetadata.Apellidos.ETIQUETA, requerido: true, errores, tamañoMaximo: UsuarioMetadata.Apellidos.TAMAÑO_MAX);
+            Validador.ValidarEmailYAgregarAListaErrores(usuario.Email, UsuarioMetadata.Propiedades.Email.ETIQUETA, requerido: true, errores);
+            Validador.ValidarStringYAgregarAListaErrores(usuario.Nombres, UsuarioMetadata.Propiedades.Nombres.ETIQUETA, requerido: true, errores, tamañoMaximo: UsuarioMetadata.Propiedades.Nombres.TAMAÑO_MAX);
+            Validador.ValidarStringYAgregarAListaErrores(usuario.Apellidos, UsuarioMetadata.Propiedades.Apellidos.ETIQUETA, requerido: true, errores, tamañoMaximo: UsuarioMetadata.Propiedades.Apellidos.TAMAÑO_MAX);
 
             Validador.LanzarExcepcionMensajeAlUsuarioSiExistenErrores(errores);
         }

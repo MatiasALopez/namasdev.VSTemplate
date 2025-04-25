@@ -3,7 +3,7 @@ insert into dbo.Parametros (nombre, valor) values
 ('ErroresMensajeDefault','Ha ocurrido un error. Por favor, intente nuevamente mas tarde.'),
 ('SitioUrl', 'https://myapp.azurewebsites.net'),
 ('CloudStorageAccountConnectionString', 'UseDevelopmentStorage=true'),
-('ServidorCorreos','{"Host":"smtp.host.ccc","Puerto":487,"Credenciales":{"UserName":"user","Password":"pwd"},"HabilitarSsl":true,"Remitente":"info@myapp.ccc","CopiaOculta":"bcc1@myapp.ccc","Headers":{{"Header1","Value1"},{"Header2","Value2"}}}')
+('ServidorCorreos','{"Host":"smtp.host.ccc","Puerto":487,"Credenciales":{"UserName":"user","Password":"pwd"},"HabilitarSsl":true,"Remitente":"no-reply@myapp.ccc","CopiaOculta":"bcc1@myapp.ccc","Headers":[{"Key":"Header1","Value":"Value1a"},{"Key":"Header1","Value":"Value1b"},{"Key":"Header2","Value":"Value2"}]}')
 go
 --====
 

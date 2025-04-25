@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
+using AutoMapper;
 using Microsoft.AspNet.Identity;
-
 using namasdev.Core.Validation;
 using namasdev.Web.Helpers;
 using namasdev.Web.Models;
+
 using MyApp.Datos;
 using MyApp.Entidades;
+using MyApp.Entidades.Metadata;
+using MyApp.Entidades.Valores;
 using MyApp.Negocio;
-using MyApp.Web.Portal.Mappers;
+using MyApp.Negocio.DTO.Usuarios;
+using MyApp.Web.Portal.Metadata.Views;
 using MyApp.Web.Portal.Models;
+using MyApp.Web.Portal.Models.Usuarios;
 using MyApp.Web.Portal.ViewModels.Usuarios;
 
 namespace MyApp.Web.Portal.Controllers
@@ -19,15 +25,19 @@ namespace MyApp.Web.Portal.Controllers
     [Authorize(Roles = AspNetRoles.ADMINISTRADOR)]
     public class UsuariosController : ControllerBase
     {
-        private const string MENSAJE_USUARIO_INEXISTENTE = "Usuario inexistente.";
-        private const string MENSAJE_USUARIO_NO_ACTIVADO = "Usuario no activado.";
-        private const string MENSAJE_USUARIO_YA_ACTIVADO = "Usuario ya activado.";
+        public const string NAME = "Usuarios";
+
+        private const string USUARIO_INEXISTENTE_MENSAJE = "Usuario inexistente.";
+        private const string USUARIO_YA_ACTIVADO_MENSAJE = "Usuario ya activado.";
+        private const string USUARIO_NO_ACTIVADO_MENSAJE = "Usuario no activado.";
+        private const string ELIMINAR_USUARIO_LOGUEADO_ERROR_MENSAJE = "No puede eliminar su propio usuario.";
 
         private readonly IUsuariosRepositorio _usuariosRepositorio;
         private readonly IUsuariosNegocio _usuariosNegocio;
         private readonly ICorreosNegocio _correosNegocio;
 
-        public UsuariosController(IUsuariosRepositorio usuariosRepositorio, IUsuariosNegocio usuariosNegocio, ICorreosNegocio correosNegocio)
+        public UsuariosController(IUsuariosRepositorio usuariosRepositorio, IUsuariosNegocio usuariosNegocio, ICorreosNegocio correosNegocio, IMapper mapper)
+            : base(mapper)
         {
             Validador.ValidarArgumentRequeridoYThrow(usuariosRepositorio, nameof(usuariosRepositorio));
             Validador.ValidarArgumentRequeridoYThrow(usuariosNegocio, nameof(usuariosNegocio));
@@ -45,8 +55,8 @@ namespace MyApp.Web.Portal.Controllers
             string orden = null,
             int pagina = 1)
         {
-            var modelo = new UsuariosViewModel 
-            { 
+            var modelo = new UsuariosViewModel
+            {
                 Rol = rol,
                 Busqueda = busqueda,
                 Pagina = pagina,
@@ -55,12 +65,16 @@ namespace MyApp.Web.Portal.Controllers
 
             var op = modelo.CrearOrdenYPaginacionParametros();
 
-            modelo.Items = UsuariosMapper.MapearUsuariosEntidadesAModelos(
-                entidades: _usuariosRepositorio.ObtenerListado(
-                    busqueda: modelo.Busqueda, rol: modelo.Rol,
-                    cargarRoles: true,
-                    op: op),
-                idsNoActivados: UserManager.ObtenerIdsUsuariosNoActivados());
+            modelo.Items = Mapear<List<UsuarioItemModel>>(_usuariosRepositorio.ObtenerListado(
+                busqueda: modelo.Busqueda, rol: modelo.Rol,
+                cargarRoles: true,
+                op: op));
+
+            var idsNoActivados = UserManager.ObtenerIdsUsuariosNoActivados();
+            foreach (var i in modelo.Items)
+            {
+                i.Activado = !idsNoActivados.Contains(i.Id);
+            }
 
             modelo.CargarPaginacion(op);
 
@@ -73,7 +87,7 @@ namespace MyApp.Web.Portal.Controllers
             var modelo = new UsuarioViewModel();
             CargarUsuarioViewModel(modelo, PaginaModo.Agregar);
 
-            return View(Views.Usuarios.USUARIO, modelo);
+            return View(UsuariosViews.USUARIO, modelo);
         }
 
         [HttpPost,
@@ -99,9 +113,11 @@ namespace MyApp.Web.Portal.Controllers
                         resultado = UserManager.AddToRoles(usuarioIdentity.Id, modelo.Rol);
                         ValidarIdentityResult(resultado);
 
+                        modelo.Id = usuarioIdentity.Id;
+
                         try
                         {
-                            var usuario = _usuariosNegocio.Agregar(usuarioIdentity.Id, modelo.Nombres, modelo.Apellidos, modelo.Email, UsuarioId);
+                            var usuario = _usuariosNegocio.Agregar(Mapear<AgregarParametros>(modelo));
                             EnviarCorreoActivacion(usuario);
                         }
                         catch (Exception)
@@ -111,7 +127,7 @@ namespace MyApp.Web.Portal.Controllers
                             throw;
                         }
 
-                        ControllerHelper.CargarMensajeResultadoOk("Usuario guardado correctamente.");
+                        ControllerHelper.CargarMensajeResultadoOk(UsuarioMetadata.Mensajes.AGREGAR_OK);
 
                         ModelState.Clear();
                         modelo = new UsuarioViewModel();
@@ -124,14 +140,18 @@ namespace MyApp.Web.Portal.Controllers
             }
 
             CargarUsuarioViewModel(modelo, PaginaModo.Agregar);
-            return View(Views.Usuarios.USUARIO, modelo);
+            return View(UsuariosViews.USUARIO, modelo);
         }
 
         [HttpPost,
         ValidateAntiForgeryToken]
         public ActionResult DesmarcarComoBorrado(string id)
         {
-            _usuariosNegocio.DesmarcarComoBorrado(id);
+            _usuariosNegocio.DesmarcarComoBorrado(new DesmarcarComoBorradoParametros
+            {
+                Id = id,
+                UsuarioLogueadoId = UsuarioId
+            });
             DesbloquearUsuario(id);
 
             return Json(new { success = true });
@@ -145,10 +165,10 @@ namespace MyApp.Web.Portal.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var modelo = UsuariosMapper.MapearUsuarioEntidadAViewModel(usuario);
+            var modelo = Mapear<UsuarioViewModel>(usuario);
             CargarUsuarioViewModel(modelo, PaginaModo.Editar);
 
-            return View(Views.Usuarios.USUARIO, modelo);
+            return View(UsuariosViews.USUARIO, modelo);
         }
 
         [HttpPost,
@@ -159,9 +179,7 @@ namespace MyApp.Web.Portal.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var usuarioEntidad = UsuariosMapper.MapearUsuarioViewModelAEntidad(modelo);
-
-                    var usuarioIdentity = UserManager.FindById(modelo.UsuarioId);
+                    var usuarioIdentity = UserManager.FindById(modelo.Id);
 
                     IdentityResult resultado;
 
@@ -187,7 +205,7 @@ namespace MyApp.Web.Portal.Controllers
 
                     try
                     {
-                        _usuariosNegocio.Actualizar(usuarioEntidad, UsuarioId);
+                        _usuariosNegocio.Actualizar(Mapear<ActualizarParametros>(modelo));
                     }
                     catch (Exception)
                     {
@@ -208,7 +226,7 @@ namespace MyApp.Web.Portal.Controllers
                         throw;
                     }
 
-                    ControllerHelper.CargarMensajeResultadoOk("Usuario actualizado correctamente.");
+                    ControllerHelper.CargarMensajeResultadoOk(UsuarioMetadata.Mensajes.EDITAR_OK);
                 }
             }
             catch (Exception ex)
@@ -217,7 +235,7 @@ namespace MyApp.Web.Portal.Controllers
             }
 
             CargarUsuarioViewModel(modelo, PaginaModo.Editar);
-            return View(Views.Usuarios.USUARIO, modelo);
+            return View(UsuariosViews.USUARIO, modelo);
         }
 
         [HttpPost,
@@ -227,18 +245,18 @@ namespace MyApp.Web.Portal.Controllers
             var user = UserManager.FindById(id);
             if (user == null)
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_INEXISTENTE });
+                return Json(new { success = false, message = USUARIO_INEXISTENTE_MENSAJE });
             }
 
             if (UserManager.IsEmailConfirmed(user.Id))
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_YA_ACTIVADO });
+                return Json(new { success = false, message = USUARIO_YA_ACTIVADO_MENSAJE });
             }
 
             var usuario = _usuariosRepositorio.Obtener(user.Id);
             if (usuario == null)
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_INEXISTENTE });
+                return Json(new { success = false, message = USUARIO_INEXISTENTE_MENSAJE });
             }
 
             EnviarCorreoActivacion(usuario);
@@ -253,18 +271,18 @@ namespace MyApp.Web.Portal.Controllers
             var user = UserManager.FindById(id);
             if (user == null)
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_INEXISTENTE });
+                return Json(new { success = false, message = USUARIO_INEXISTENTE_MENSAJE });
             }
 
             if (!UserManager.IsEmailConfirmed(user.Id))
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_NO_ACTIVADO });
+                return Json(new { success = false, message = USUARIO_NO_ACTIVADO_MENSAJE });
             }
 
             var usuario = _usuariosRepositorio.Obtener(user.Id);
             if (usuario == null)
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_INEXISTENTE });
+                return Json(new { success = false, message = USUARIO_INEXISTENTE_MENSAJE });
             }
 
             _correosNegocio.EnviarCorreoResetearPassword(
@@ -284,23 +302,27 @@ namespace MyApp.Web.Portal.Controllers
 
             if (user == null && usuario == null)
             {
-                return Json(new { success = false, message = MENSAJE_USUARIO_INEXISTENTE });
+                return Json(new { success = false, message = USUARIO_INEXISTENTE_MENSAJE });
             }
 
-            // Controla que no elimine el usuario que actualmente está logeado.
+            // No se puede eliminar el usuario logeado
             if (user != null && user.Id == User.Identity.GetUserId())
             {
-                return Json(new { success = false, message = "No puede eliminar su propio usuario." });
+                return Json(new { success = false, message = ELIMINAR_USUARIO_LOGUEADO_ERROR_MENSAJE });
             }
 
             try
             {
-                _usuariosNegocio.MarcarComoBorrado(id, UsuarioId);
+                _usuariosNegocio.MarcarComoBorrado(new MarcarComoBorradoParametros
+                {
+                    Id = id,
+                    UsuarioLogueadoId = UsuarioId
+                });
                 BloquearUsuario(id);
             }
             catch (Exception)
             {
-                return Json(new { success = false, message = "No se pudo eliminar el usuario." });
+                return Json(new { success = false, message = UsuarioMetadata.Mensajes.ELIMINAR_ERROR });
             }
 
             return Json(new { success = true });

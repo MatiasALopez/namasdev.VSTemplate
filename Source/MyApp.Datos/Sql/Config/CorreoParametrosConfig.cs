@@ -16,7 +16,7 @@ namespace MyApp.Datos.Sql.Config
 
             Property(e => e.Asunto)
                 .IsRequired()
-                .HasMaxLength(Entidades.Metadata.CorreoParametrosMetadata.Asunto.TAMAÑO_MAX);
+                .HasMaxLength(Entidades.Metadata.CorreoParametrosMetadata.Propiedades.Asunto.TAMAÑO_MAX);
         }
     }
 }

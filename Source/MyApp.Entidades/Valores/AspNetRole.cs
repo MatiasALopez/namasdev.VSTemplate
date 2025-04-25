@@ -1,4 +1,4 @@
-﻿namespace MyApp.Entidades
+﻿namespace MyApp.Entidades.Valores
 {
     public class AspNetRoles
     {
