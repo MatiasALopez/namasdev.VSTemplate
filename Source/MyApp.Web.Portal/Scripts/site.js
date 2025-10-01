@@ -21,15 +21,12 @@
             confirm: false,
             confirmTitle: null,
             confirmMessage: null,
-            confirmButtons: null,
+            confirmOptions: null,
         }
 
         var opts = $.extend({}, optsDefaults, options);
 
         if (opts.confirm) {
-            var confirmOpts = opts.confirmButtons != null
-                ? { buttons: opts.confirmButtons }
-                : null;
             nmd.ui.controls.showConfirmModal(
                 opts.confirmTitle,
                 opts.confirmMessage,
@@ -38,7 +35,7 @@
                         post();
                     }
                 },
-                confirmOpts
+                opts.confirmOptions
             );
         } else {
             post();
