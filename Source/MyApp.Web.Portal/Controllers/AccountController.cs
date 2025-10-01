@@ -100,7 +100,7 @@ namespace MyApp.Web.Portal.Controllers
         {
             SignOutAndClearSession();
 
-            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
+            return RedirectToAction(nameof(HomeController.Index), HomeController.NAME);
         }
 
         [AllowAnonymous]
@@ -221,7 +221,7 @@ namespace MyApp.Web.Portal.Controllers
 
                     _correosNegocio.EnviarCorreoResetearPassword(
                         model.Email,
-                        nombreYApellido: usuarioEntidad.ToString(),
+                        nombreYApellido: usuarioEntidad.NombresYApellidos,
                         resetearPasswordUrl: URLHelper.GenerarRutaAbsoluta(Url.Action(nameof(ResetearPassword), new { id = user.Id, code = UserManager.GeneratePasswordResetToken(user.Id) })));
 
                     return RedirectToAction(nameof(OlvidoPasswordConfirmacion));

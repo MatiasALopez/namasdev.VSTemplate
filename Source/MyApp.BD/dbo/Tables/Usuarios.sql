@@ -5,7 +5,7 @@
 	[Nombres] nvarchar(100) NOT NULL,
 	[Apellidos] nvarchar(100) NOT NULL,
 	[NombresYApellidos] AS CAST(concat([Nombres],' ',[Apellidos]) AS nvarchar(200)), 
-	[ApellidosYNombres] AS CAST(concat([Apellidos],' ',[Nombres]) AS nvarchar(200)), 
+	[ApellidosYNombres] AS CAST(concat([Apellidos],', ',[Nombres]) AS nvarchar(200)), 
 	[CreadoPor] nvarchar(128) NOT NULL,
 	[CreadoFecha] datetime NOT NULL,
 	[UltimaModificacionPor] nvarchar(128) NOT NULL,

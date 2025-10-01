@@ -1,6 +1,7 @@
-﻿@using MyApp.Entidades;
+﻿@using namasdev.Web.Helpers;
+@using MyApp.Entidades;
 @using MyApp.Entidades.Metadata;
-@using namasdev.Web.Helpers;
+@using MyApp.Web.Portal.Controllers;
 @model MyApp.Web.Portal.ViewModels.Usuarios.UsuariosViewModel
 @{
     ViewBag.Title = UsuarioMetadata.ETIQUETA_PLURAL;
@@ -22,16 +23,25 @@
         BotonReenviarActivacion = "btn-reenviar-activacion",
         BotonEliminar = "btn-eliminar"
     };
+    var actions = new
+    {
+        Index = nameof(UsuariosController.Index),
+        Agregar = nameof(UsuariosController.Agregar),
+        Editar = nameof(UsuariosController.Editar),
+        Eliminar = nameof(UsuariosController.Eliminar),
+        ResetearPassword = nameof(UsuariosController.ResetearPassword),
+        ReenviarActivacion = nameof(UsuariosController.ReenviarActivacion),
+    };
 }
 <h2 class="my-2">@ViewBag.Title</h2>
 @Html.Partial("_ResultadoOk")
 @Html.Partial("_Errores")
 <div class="row my-3">
     <div class="col-md-3">
-        <a href="@Url.Action("Agregar")" class="btn btn-primary">Agregar</a>
+        <a href="@Url.Action(actions.Agregar)" class="btn btn-primary">Agregar</a>
     </div>
     <div class="col-md-9 text-right filtros">
-        @using (Html.BeginForm("Index", "Usuarios", FormMethod.Get, new { @class = "form-inline pull-right" }))
+        @using (Html.BeginForm(actions.Index, UsuariosController.NAME, FormMethod.Get, new { @class = "form-inline pull-right" }))
         {
             @Html.DropDownListFor(m => m.Rol, Model.RolesSelectList, displayNames.Rol, new { @class = "form-control ml-1", title = displayNames.Rol, data_toggle = "tooltip" })
             @Html.TextBoxFor(m => m.Busqueda, new { @class = "form-control ml-1", placeholder = displayNames.Busqueda, title = displayNames.Busqueda, data_toggle = "tooltip" })
@@ -66,7 +76,7 @@
                                 <td>@item.Email</td>
                                 <td>@item.Rol</td>
                                 <td class="text-center">
-                                    <a href="@Url.Action("Editar", new { id = item.Id })" class="btn btn-sm btn-outline-secondary"><i class="fa fa-edit" data-toggle="tooltip" title="Editar"></i></a>
+                                    <a href="@Url.Action(actions.Editar, new { id = item.Id })" class="btn btn-sm btn-outline-secondary"><i class="fa fa-edit" data-toggle="tooltip" title="Editar"></i></a>
                                     @if (item.Activado)
                                     {
                                         <button class="btn btn-sm btn-outline-secondary @clasesCss.BotonResetearPassword" data-id="@item.Id"><i class="fa fa-key" data-toggle="tooltip" title="Resetear password"></i></button>
@@ -111,7 +121,7 @@
                         confirmMessage: '¿Estás seguro que deseas resetear el password del usuario seleccionado?'
                     };
                     myApp.postJson(
-                        '@Url.Action("ResetearPassword")/' + id,
+                        '@Url.Action(actions.ResetearPassword)/' + id,
                         nmd.ui.forms.createDataWithAntiForgeryToken('#@controlesIds.Form'),
                         function (response) {
                             if (response.success) {
@@ -143,7 +153,7 @@
                         confirmMessage: '¿Estás seguro que deseas eliminar el usuario seleccionado?'
                     };
                     myApp.postJson(
-                        '@Url.Action("Eliminar")/' + id,
+                        '@Url.Action(actions.Eliminar)/' + id,
                         nmd.ui.forms.createDataWithAntiForgeryToken('#@controlesIds.Form'),
                         function (response) {
                             if (response.success) {
@@ -176,7 +186,7 @@
                         showLoadingSelector: '#@controlesIds.TablaContainer',
                     };
                     myApp.postJson(
-                        '@Url.Action("ReenviarActivacion")/' + id,
+                        '@Url.Action(actions.ReenviarActivacion)/' + id,
                         nmd.ui.forms.createDataWithAntiForgeryToken('#@controlesIds.Form'),
                         function (response) {
                             if (response.success) {

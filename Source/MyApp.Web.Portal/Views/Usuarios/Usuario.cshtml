@@ -9,6 +9,12 @@
     {
         Form = $"frm{UsuarioMetadata.NOMBRE}"
     };
+    var actions = new
+    {
+        Index = nameof(UsuariosController.Index),
+        Editar = nameof(UsuariosController.Editar),
+        DesmarcarComoBorrado = nameof(UsuariosController.DesmarcarComoBorrado),
+    };
 }
 <h2 class="my-3">@ViewBag.Title</h2>
 <form id="@controlesIds.Form" action="@Url.Action()" method="post" class="mt-3">
@@ -43,7 +49,7 @@
         </div>
     </div>
     <button type="submit" class="btn btn-primary" data-toggle-state-container="#@controlesIds.Form">Guardar</button>
-    <a href="@Url.Action(nameof(UsuariosController.Index))" class="btn btn-secondary">Volver</a>
+    <a href="@Url.Action(actions.Index)" class="btn btn-secondary">Volver</a>
 </form>
 @section bodyScripts {
     <script type="text/javascript">
@@ -67,14 +73,14 @@
             };
 
             myApp.postJson(
-                '@Url.Action("DesmarcarComoBorrado")/@Model.DesmarcarBorradoUsuarioId',
+                '@Url.Action(actions.DesmarcarComoBorrado)/@Model.DesmarcarBorradoUsuarioId',
                 nmd.ui.forms.createDataWithAntiForgeryToken('#@controlesIds.Form'),
                 function (response) {
                     if (response.success) {
                         nmd.ui.controls.showSuccessModal(
-                            'Usuario reactivado correctamente. Si desea revisar/editar sus datos haga clic <a href="@Url.Action("Editar", "Usuarios")/@Model.DesmarcarBorradoUsuarioId">aquí</a>.',
+                            'Usuario reactivado correctamente. Si desea revisar/editar sus datos haga clic <a href="@Url.Action(actions.Editar)/@Model.DesmarcarBorradoUsuarioId">aquí</a>.',
                             function () {
-                                window.location = '@Url.Action("Index")';
+                                window.location = '@Url.Action(actions.Index)';
                             });
                     }
                     else {
