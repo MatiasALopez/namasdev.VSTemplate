@@ -1,4 +1,4 @@
-﻿--====
+﻿--===
 CREATE TABLE [dbo].[AspNetUsers] 
 (
     [Id]                   NVARCHAR (128) NOT NULL,
@@ -19,10 +19,10 @@ GO
 
 CREATE UNIQUE NONCLUSTERED INDEX [IX_AspNetUsers_UserName] ON [dbo].[AspNetUsers]([UserName] ASC);
 go
---====
+--===
 
 
---====
+--===
 CREATE TABLE [dbo].[AspNetRoles] (
     [Id]   NVARCHAR (128) NOT NULL,
     [Name] NVARCHAR (256) NOT NULL,
@@ -32,10 +32,10 @@ go
 
 CREATE UNIQUE NONCLUSTERED INDEX [IX_AspNetRoles_Name] ON [dbo].[AspNetRoles]([Name] ASC);
 GO
---====
+--===
 
 
---====
+--===
 CREATE TABLE [dbo].[AspNetUserLogins] (
     [LoginProvider] NVARCHAR (128) NOT NULL,
     [ProviderKey]   NVARCHAR (128) NOT NULL,
@@ -47,10 +47,10 @@ GO
 
 CREATE NONCLUSTERED INDEX [IX_AspNetUserLogins_UserId] ON [dbo].[AspNetUserLogins]([UserId] ASC);
 GO
---====
+--===
 
 
---====
+--===
 CREATE TABLE [dbo].[AspNetUserClaims] (
     [Id]         INT            IDENTITY (1, 1) NOT NULL,
     [UserId]     NVARCHAR (128) NOT NULL,
@@ -63,10 +63,10 @@ GO
 
 CREATE NONCLUSTERED INDEX [IX_AspNetUserClaims_UserId] ON [dbo].[AspNetUserClaims]([UserId] ASC);
 GO
---====
+--===
 
 
---====
+--===
 CREATE TABLE [dbo].[AspNetUserRoles] (
     [UserId] NVARCHAR (128) NOT NULL,
     [RoleId] NVARCHAR (128) NOT NULL,
@@ -81,10 +81,10 @@ GO
 
 CREATE NONCLUSTERED INDEX [IX_AspNetUserRoles_UserId] ON [dbo].[AspNetUserRoles]([UserId] ASC);
 GO
---====
+--===
 
 
---====
+--===
 CREATE TABLE [dbo].[Parametros]
 (
 	[Nombre] nvarchar(100) not null,
@@ -93,10 +93,10 @@ CREATE TABLE [dbo].[Parametros]
 	constraint [PK_Parametros] primary key clustered ([Nombre])
 )
 go
---====
+--===
 
 
---====
+--===
 create table [dbo].[CorreosParametros]
 (
 	[Id] smallint not null,
@@ -107,9 +107,9 @@ create table [dbo].[CorreosParametros]
     constraint [PK_CorreosParametros] primary key clustered ([Id])
 )
 go
---====
+--===
 
---=====
+--===
 CREATE TABLE [dbo].[Errores]
 (
 	[Id] uniqueidentifier NOT NULL,
@@ -123,10 +123,10 @@ CREATE TABLE [dbo].[Errores]
 	CONSTRAINT [PK_Errores] PRIMARY KEY CLUSTERED ([Id] ASC)
 )
 GO
---=====
+--===
 
 
---=====
+--===
 create table [dbo].[Usuarios]
 (
 	[UsuarioId] nvarchar(128) NOT NULL,
@@ -147,4 +147,4 @@ create table [dbo].[Usuarios]
 	constraint [FK_Usuarios_UsuarioId] foreign key ([UsuarioId]) references [dbo].[AspNetUsers] ([Id]) on delete cascade
 )
 go
---=====
+--===
